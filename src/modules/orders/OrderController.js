@@ -1,45 +1,90 @@
 const pool = require("../../config/database");
+const redisClient = require("../../config/redis");
 
-class OrderController {
-  static async getOrders(req, res) {
+class ProductController {
+  // Get all products
+  static async getAllProducts(req, res) {
     try {
-      const [orders] = await pool.query(
-        "SELECT * FROM orders WHERE user_id = ? ORDER BY id DESC",
-        [req.user.id]
+      const cacheKey = "products:all";
+
+      const cachedProducts = await redisClient.get(cacheKey);
+
+      if (cachedProducts) {
+        return res.json(JSON.parse(cachedProducts));
+      }
+
+      const [products] = await pool.query(
+        "SELECT * FROM products ORDER BY id DESC"
       );
 
-      res.json(orders);
+      await redisClient.setEx(cacheKey, 60, JSON.stringify(products));
+
+      res.json(products);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({
+        message: error.message,
+      });
     }
   }
 
-  static async getOrderById(req, res) {
+  // Get single product by ID
+  static async getProductById(req, res) {
     try {
-      const [orders] = await pool.query(
-        "SELECT * FROM orders WHERE id = ? AND user_id = ?",
-        [req.params.id, req.user.id]
+      const { id } = req.params;
+
+      const [products] = await pool.query(
+        "SELECT * FROM products WHERE id = ?",
+        [id]
       );
 
-      const order = orders[0];
-
-      if (!order) {
-        return res.status(404).json({ message: "Order not found" });
+      if (products.length === 0) {
+        return res.status(404).json({
+          message: "Product not found",
+        });
       }
 
-      const [items] = await pool.query(
-        "SELECT * FROM order_items WHERE order_id = ?",
-        [order.id]
+      res.json(products[0]);
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
+      });
+    }
+  }
+
+  // Create product
+  static async createProduct(req, res) {
+    try {
+      const { name, price, stock } = req.body;
+
+      if (!name || !price || !stock) {
+        return res.status(400).json({
+          message: "All fields are required",
+        });
+      }
+
+      const [result] = await pool.query(
+        "INSERT INTO products (name, price, stock) VALUES (?, ?, ?)",
+        [name, price, stock]
       );
 
-      res.json({
-        ...order,
-        items,
+      // Clear cache
+      await redisClient.del("products:all");
+
+      res.status(201).json({
+        message: "Product created successfully",
+        product: {
+          id: result.insertId,
+          name,
+          price,
+          stock,
+        },
       });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({
+        message: error.message,
+      });
     }
   }
 }
 
-module.exports = OrderController;
+module.exports = ProductController;
