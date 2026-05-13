@@ -1,4 +1,4 @@
-const pool = require("../../config/db");
+const pool = require("../../data/database");
 
 class CartController {
   static async getCart(req, res) {

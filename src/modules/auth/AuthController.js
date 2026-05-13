@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const pool = require("../../config/db");
+const pool = require("../../data/database");
 
 class AuthController {
   static async register(req, res) {
