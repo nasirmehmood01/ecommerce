@@ -9,6 +9,7 @@ const productRoutes = require("./src/modules/products/productRoutes");
 const cartRoutes = require("./src/modules/cart/cartRoutes");
 const checkoutRoutes = require("./src/modules/checkout/checkoutRoutes");
 const orderRoutes = require("./src/modules/orders/orderRoutes");
+const redisClient = require("./src/config/redis");
 
 const app = express();
 
@@ -32,6 +33,10 @@ app.use("/orders", orderRoutes);
 
 const PORT = process.env.PORT || 3000;
 
+redisClient.connect()
+  .then(() => console.log("Redis connected"))
+  .catch((err) => console.error("Redis connection error:", err));
+  
 app.listen(PORT, () => {
   console.log(`E-commerce API running on port ${PORT}`);
 });
