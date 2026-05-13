@@ -2,27 +2,27 @@ const pool = require("../../config/database");
 const redisClient = require("../../config/redis");
 
 class ProductController {
-  static async getAllProducts(req, res) {
-    try {
-      const cacheKey = "products:all";
+  // static async getAllProducts(req, res) {
+  //   try {
+  //     const cacheKey = "products:all";
 
-      const cachedProducts = await redisClient.get(cacheKey);
+  //     const cachedProducts = await redisClient.get(cacheKey);
 
-      if (cachedProducts) {
-        return res.json(JSON.parse(cachedProducts));
-      }
+  //     if (cachedProducts) {
+  //       return res.json(JSON.parse(cachedProducts));
+  //     }
 
-      const [products] = await pool.query(
-        "SELECT * FROM products ORDER BY id DESC"
-      );
+  //     const [products] = await pool.query(
+  //       "SELECT * FROM products ORDER BY id DESC"
+  //     );
 
-      await redisClient.setEx(cacheKey, 60, JSON.stringify(products));
+  //     await redisClient.setEx(cacheKey, 60, JSON.stringify(products));
 
-      res.json(products);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  }
+  //     res.json(products);
+  //   } catch (error) {
+  //     res.status(500).json({ message: error.message });
+  //   }
+  // }
 
   static async getProductById(req, res) {
   try {
@@ -42,7 +42,7 @@ class ProductController {
     res.status(500).json({ message: error.message });
   }
 }
-  
+
   static async createProduct(req, res) {
     try {
       const { name, price, stock } = req.body;
