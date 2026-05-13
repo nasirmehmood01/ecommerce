@@ -1,54 +1,58 @@
-const { products } = require("../../data/database");
+const pool = require("../../config/db");
 
 class ProductController {
-  static getAllProducts(req, res) {
-    res.json(products);
+  static async getAllProducts(req, res) {
+    try {
+      const [products] = await pool.query(
+        "SELECT * FROM products ORDER BY id DESC"
+      );
+
+      res.json(products);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
   }
 
-  static getProductById(req, res) {
-    const product = products.find((product) => product.id === req.params.id);
+  static async getProductById(req, res) {
+    try {
+      const [products] = await pool.query(
+        "SELECT * FROM products WHERE id = ?",
+        [req.params.id]
+      );
 
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      const product = products[0];
+
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      res.json(product);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-
-    res.json(product);
   }
 
-  static createProduct(req, res) {
-    const { name, price, stock } = req.body;
+  static async createProduct(req, res) {
+    try {
+      const { name, price, stock } = req.body;
 
-    if (!name || price === undefined || stock === undefined) {
-      return res.status(400).json({
-        message: "Name, price and stock are required"
+      const [result] = await pool.query(
+        "INSERT INTO products (name, price, stock) VALUES (?, ?, ?)",
+        [name, price, stock]
+      );
+
+      res.status(201).json({
+        message: "Product created successfully",
+        product: {
+          id: result.insertId,
+          name,
+          price,
+          stock,
+        },
       });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-
-    if (price <= 0) {
-      return res.status(400).json({
-        message: "Price must be greater than 0"
-      });
-    }
-
-    if (stock < 0) {
-      return res.status(400).json({
-        message: "Stock cannot be negative"
-      });
-    }
-
-    const product = {
-      id: `prod_${Date.now()}`,
-      name,
-      price,
-      stock
-    };
-
-    products.push(product);
-
-    res.status(201).json({
-      message: "Product created successfully",
-      product
-    });
   }
 }
 

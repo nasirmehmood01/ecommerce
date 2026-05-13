@@ -1,18 +1,23 @@
-const { users } = require("../../data/database");
+const pool = require("../../config/db");
 
 class UserController {
-  static getMe(req, res) {
-    const user = users.find((user) => user.id === req.user.id);
+  static async getMe(req, res) {
+    try {
+      const [users] = await pool.query(
+        "SELECT id, name, email FROM users WHERE id = ?",
+        [req.user.id]
+      );
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      const user = users[0];
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-
-    res.json({
-      id: user.id,
-      name: user.name,
-      email: user.email
-    });
   }
 }
 
