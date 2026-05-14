@@ -21,7 +21,7 @@ app.get("/health", (req, res) => {
     status: "ok",
     service: "ecommerce-backend",
     timestamp: new Date().toISOString(),
-    version: "v3.0.0",
+    version: "v6.0.0",
   });
 });
 
