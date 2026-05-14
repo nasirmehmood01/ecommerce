@@ -9,7 +9,7 @@ const productRoutes = require("./src/modules/products/productRoutes");
 const cartRoutes = require("./src/modules/cart/cartRoutes");
 const checkoutRoutes = require("./src/modules/checkout/checkoutRoutes");
 const orderRoutes = require("./src/modules/orders/orderRoutes");
-const { connectRedis } = require("./src/config/redis");
+// const { connectRedis } = require("./src/config/redis");
 
 const app = express();
 
@@ -33,17 +33,17 @@ app.use("/orders", orderRoutes);
 
 const PORT = process.env.PORT || 3000;
   
-connectRedis()
-  .then(() => {
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`E-commerce API running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error("Failed to start server:", err.message);
-    process.exit(1);
-  });
+// connectRedis()
+//   .then(() => {
+//     app.listen(PORT, "0.0.0.0", () => {
+//       console.log(`E-commerce API running on port ${PORT}`);
+//     });
+//   })
+//   .catch((err) => {
+//     console.error("Failed to start server:", err.message);
+//     process.exit(1);
+//   });
 
-// app.listen(PORT, () => {
-//   console.log(`E-commerce API running on port ${PORT}`);
-// });
+app.listen(PORT, () => {
+  console.log(`E-commerce API running on port ${PORT}`);
+});
