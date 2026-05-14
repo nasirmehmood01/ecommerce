@@ -10,6 +10,7 @@ const cartRoutes = require("./src/modules/cart/cartRoutes");
 const checkoutRoutes = require("./src/modules/checkout/checkoutRoutes");
 const orderRoutes = require("./src/modules/orders/orderRoutes");
 const { connectRedis } = require("./src/config/redis");
+const { version } = require("react");
 
 const app = express();
 
@@ -20,7 +21,8 @@ app.get("/health", (req, res) => {
   res.json({
     status: "ok",
     service: "ecommerce-backend",
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    version: "v2.0.0",
   });
 });
 
