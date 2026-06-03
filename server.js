@@ -9,7 +9,7 @@ const productRoutes = require("./src/modules/products/productRoutes");
 const cartRoutes = require("./src/modules/cart/cartRoutes");
 const checkoutRoutes = require("./src/modules/checkout/checkoutRoutes");
 const orderRoutes = require("./src/modules/orders/orderRoutes");
-// const { connectRedis } = require("./src/config/redis");
+const { connectRedis } = require("./src/config/redis");
 
 const app = express();
 
@@ -17,26 +17,13 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/health", (req, res) => {
-  console.log(
-    `[HEALTH CHECK] ${new Date().toISOString()} | ${req.method} ${req.originalUrl} | IP: ${req.ip}`
-  );
-
   res.json({
     status: "ok",
     service: "ecommerce-backend",
     timestamp: new Date().toISOString(),
-    version: "v6.0.0",
+    version: "v3.0.0",
   });
 });
-
-// app.get("/health", (req, res) => {
-//   res.json({
-//     status: "ok",
-//     service: "ecommerce-backend",
-//     timestamp: new Date().toISOString(),
-//     version: "v6.0.0",
-//   });
-// });
 
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
@@ -47,17 +34,17 @@ app.use("/orders", orderRoutes);
 
 const PORT = process.env.PORT || 3000;
   
-// connectRedis()
-//   .then(() => {
-//     app.listen(PORT, "0.0.0.0", () => {
-//       console.log(`E-commerce API running on port ${PORT}`);
-//     });
-//   })
-//   .catch((err) => {
-//     console.error("Failed to start server:", err.message);
-//     process.exit(1);
-//   });
+connectRedis()
+  .then(() => {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`E-commerce API running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to start server:", err.message);
+    process.exit(1);
+  });
 
-app.listen(PORT, () => {
-  console.log(`E-commerce API running on port ${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`E-commerce API running on port ${PORT}`);
+// });
