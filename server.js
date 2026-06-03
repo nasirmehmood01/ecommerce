@@ -17,13 +17,26 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/health", (req, res) => {
+  console.log(
+    `[HEALTH CHECK] ${new Date().toISOString()} | ${req.method} ${req.originalUrl} | IP: ${req.ip}`
+  );
+
   res.json({
     status: "ok",
     service: "ecommerce-backend",
     timestamp: new Date().toISOString(),
-    version: "v5.0.0",
+    version: "v6.0.0",
   });
 });
+
+// app.get("/health", (req, res) => {
+//   res.json({
+//     status: "ok",
+//     service: "ecommerce-backend",
+//     timestamp: new Date().toISOString(),
+//     version: "v6.0.0",
+//   });
+// });
 
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
