@@ -107,7 +107,7 @@
 
 
 /// <<<<------- Using RDS db ------->>>>
-const pool = require("../../data/database");
+const pool = require("../../config/database");
 
 class ProductController {
   static async getAllProducts(req, res) {
